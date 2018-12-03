@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Botkito
@@ -17,7 +18,7 @@ namespace Botkito
             client.Log += Log;
             client.MessageReceived += MessageReceived;
 
-            string token = ""; // Remember to keep this private!
+            string token = File.ReadAllText("token.txt");
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
 
