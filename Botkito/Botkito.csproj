@@ -6,10 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Discord.Net" Version="1.0.2" />
+    <PackageReference Include="GoogleApi" Version="3.7.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="google-token.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="token.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

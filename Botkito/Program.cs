@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using Autofac;
+using Botkito.Configuration;
+using Discord;
 using Discord.WebSocket;
 using System;
 using System.IO;
@@ -14,9 +16,12 @@ namespace Botkito
         public async Task MainAsync()
         {
             var client = new DiscordSocketClient();
+            var container = ComponentRegister.BuildContainer();
+
+            var commandcontroller = container.Resolve<CommandController>();
 
             client.Log += Log;
-            client.MessageReceived += MessageReceived;
+            client.MessageReceived += commandcontroller.Hanlde;
 
             string token = File.ReadAllText("token.txt");
             await client.LoginAsync(TokenType.Bot, token);
@@ -24,14 +29,6 @@ namespace Botkito
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
-        }
-
-        private async Task MessageReceived(SocketMessage message)
-        {
-            if (message.Content == "!ping")
-            {
-                await message.Channel.SendMessageAsync("Pong!");
-            }
         }
 
         private Task Log(LogMessage msg)
