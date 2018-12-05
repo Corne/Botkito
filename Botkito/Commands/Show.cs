@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Botkito.Commands
@@ -19,6 +20,9 @@ namespace Botkito.Commands
             try
             {
                 string[] args = message.Content.Split(' ');
+                if (args.Length == 0)
+                    return;
+
                 string search = string.Join(' ', args.Skip(1));
 
                 if (string.IsNullOrWhiteSpace(search))
@@ -36,7 +40,27 @@ namespace Botkito.Commands
                 RootObject result = JsonConvert.DeserializeObject<RootObject>(response.RawJson);
 
 
-                await message.Channel.SendMessageAsync(result.items[0].link);
+                if (result.items.Count == 0)
+                {
+                    await message.Channel.SendMessageAsync("Beep bop, sorry could not find anything for your request");
+                    return;
+                }
+
+                using (var webclient = new WebClient())
+                {
+                    var item = result.items[0];
+
+                    string path = Path.GetTempPath();
+
+                    string filename = Path.GetFileName(item.link.Split('?')[0]);
+                    string filepath = Path.Combine(path, filename);
+                    
+
+                    await webclient.DownloadFileTaskAsync(item.link, filepath).ConfigureAwait(false);
+                    await message.Channel.SendFileAsync(filepath).ConfigureAwait(false);
+
+                    File.Delete(filepath);
+                }
             }
             catch (Exception ex)
             {
